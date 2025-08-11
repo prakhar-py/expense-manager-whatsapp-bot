@@ -21,8 +21,6 @@ import pickle
 
 load_dotenv()
 
-app = Flask(__name__)
-
 state_db = {}
 
 light_llm = ChatGroq(
@@ -31,7 +29,7 @@ light_llm = ChatGroq(
     api_key=os.getenv("GROQ_API_KEY"),
 )
 heavy_llm = ChatGroq(
-    model="llama-3.3-70b-versatile",
+    model="openai/gpt-oss-20b",
     temperature=0,
     api_key=os.getenv("GROQ_API_KEY"),
 )
@@ -238,8 +236,8 @@ print(f"Graph saved as 'my_graph.png' in {os.getcwd()}")
 # graph.add_node()
 
 
-@app.route("/", methods=["POST"])
-def main():
+
+def main(user_msg, user):
     global state_db
 
     state_db_file = "state_db.pkl"
@@ -249,9 +247,6 @@ def main():
     else:
         with open(state_db_file, "rb") as f:
             state_db = pickle.load(f)
-
-    user_msg = request.values.get("Body", "")
-    user = request.values.get("From", "").split(":")[1]
 
     # # user_msg = "Today I bought a coffee for 20 rs and a coca cola for 80 rs."
     state = get_session_history(user)
@@ -281,6 +276,4 @@ def main():
     return str(response)
 
 
-# main()/
-if __name__ == "__main__":
-    app.run(port=5002)
+
